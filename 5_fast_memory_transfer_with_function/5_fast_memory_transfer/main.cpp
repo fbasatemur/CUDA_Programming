@@ -5,7 +5,7 @@
 
 void main()
 {
-	const int numberCount = 1024 * 1024;	// allocation size
+	const int numberCount = 101 * 1024 * 1024;	// allocation size
 	struct cpu_gpu_mem cgm;
 
 	cgm.numberCount = numberCount;
@@ -13,9 +13,11 @@ void main()
 	cpu_gpu_alloc(&cgm);
 	cpu_gpu_set_numbers(&cgm);
 
+	cpu_gpu_pin(&cgm);
 	cpu_gpu_host_to_dev(&cgm);
 	cpu_gpu_execute(&cgm);
 	cpu_gpu_dev_to_host(&cgm);
+	cpu_gpu_unpin(&cgm);
 
 	cpu_gpu_print_results(&cgm);
 
