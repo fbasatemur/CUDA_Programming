@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <iostream>
 
-const long allocation_size = 1 * 1024 * 1024 * 1024;
+const long allocation_size = 1 * 1024 * 1024 * 1024;	// 1GB allocation size
 
 void* cpu_p;
 void* gpu_p;
 
-void cpuAlloc()
+void cpuAlloc()											// cpu memory allocation
 {
 	cpu_p = malloc(allocation_size);
 }
@@ -31,13 +31,13 @@ void main()
 {
 
 	cpuAlloc();
-	std::cout << gpuAlloc();		// return 0 -> true
+	std::cout << gpuAlloc();							// result = 0 -> allocation success
 
 	system("pause");
 
 	try
 	{
-		gpuFree();
+		std::cout << gpuFree();							// result = 0 -> flush success
 		free(cpu_p);
 	}
 	catch (const std::exception & error)

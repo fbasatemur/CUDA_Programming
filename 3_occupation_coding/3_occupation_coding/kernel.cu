@@ -5,7 +5,7 @@
 #include "device_launch_parameters.h"
 #include <assert.h>
 
-int number_count = 640;										// Allocation yapilacak int miktari
+int number_count = 500 * 1024 * 1024;						// Allocation yapilacak int miktari
 const int allocation_size = number_count * sizeof(int);		// number_count * 4 B
 
 void* cpu_p;
@@ -51,29 +51,42 @@ void cpuSetNumbers()										// cpu bellek alanina, number_count kadar sayi set
 
 __global__ void gpuAdd(int* gpu_numbers)					// Paralel islemlenecek kisim, nvcc tarafindan burada compiler edilir
 {
-	int threadId = threadIdx.x;								// GPU de calisacak fonksiyon threadIdx isminde bir degiskene sahiptir
-															// threadIdx degiskeni 0 dan baslayarak, baslatilan thread sayisina kadar ilerler
-	gpu_numbers[threadId] *= 2;								// gpu_numbers adresindeki her degeri 2 katina cikar
+	//	int threadIndexOfTheThread = threadIdx.x;								// anlik thread index
+	//	int blockIndexOfTheThread = blockIdx.x;									// anlik block index
+
+	//	int threadCountInOneBlock = blockDim.x;									// bir bloktaki toplam thread sayisi
+	//	int blockCountInThisKernel = gridDim.x;									// toplam block sayisi
+	//	
+	//	int id = blockIndexOfTheThread * threadCountInOneBlock + threadIndexOfTheThread;
+
+	//	printf("%d \t %d \t  %d \t  %d \t  %d \t \n", id, threadIndexOfTheThread, blockIndexOfTheThread, blockCountInThisKernel, threadCountInOneBlock);
+
+	
+	// bir block sonlandiginda, thread index tekrar sifirlanacaktir.Bu ise veri karmasasina neden olabilir.
+	int id = blockIdx.x * blockDim.x + threadIdx.x;			// Bunu engellemek icin index degeri duzenlenir
+
+	gpu_numbers[id] *= 2;
 }
 
 
 
-void printCpuNumbers()
+void printCpuNumbers()										
 {
 	int* cpu_int32 = (int*)cpu_p;
 
-	for (size_t i = 0; i < number_count; i++) {
+	for (size_t i = number_count - 100; i < number_count; i++)		// son 100 degeri yazdir 
+	{		
 		printf("%d\t%d\n", i, cpu_int32[i]);
 	}
 }
 
 
-void cpuFree()												// cpu memory serbest birak
+void cpuFree()														// cpu memory serbest birak
 {
 	free(cpu_p);
 }
 
-void gpuFree()												// gpu memory serbest birak
+void gpuFree()														// gpu memory serbest birak
 {
 	cudaError_t result = cudaFree(gpu_p);
 	assert(result == cudaSuccess);
@@ -89,18 +102,21 @@ void main()
 
 	// GPU bellegi uzerinden paralel veri islemleme yapiliyor..
 
-	gpuAdd <<< 1, number_count >>> ((int*)gpu_p);
-														// GPU uzerinde tum islemler asenkron olarak yapilacaktir...
+	int blockDim = 64;									// Bir bloktaki toplam thread sayisi
+	int gridDim = number_count / blockDim;				// toplam block sayisi = toplam thread sayisi / blockDim
+
+	gpuAdd <<< gridDim, blockDim >> > ((int*)gpu_p);
+	// GPU uzerinde tum islemler asenkron olarak yapilacaktir...
 	cudaError_t result = cudaDeviceSynchronize();		// cudaDeviceSynchronize ile tum islemlerin bitmesini bekleriz.. 
 	assert(result == cudaSuccess);						// if it is result = 0, process successful  
-	
+
 
 	gpuMemoryToCpuMemory();								// Cpu memory alanina, Gpu bellek alaninda islemlenen tum degerler aktarilir
 
 	printCpuNumbers();
-	
+
 	gpuFree();
 	cpuFree();
 
-	system("pause");
+	getchar();
 }

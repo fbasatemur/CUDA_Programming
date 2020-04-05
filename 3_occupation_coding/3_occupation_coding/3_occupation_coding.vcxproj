@@ -11,9 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{EC159E83-FD9E-4609-9FC7-61308E30C3EB}</ProjectGuid>
-    <RootNamespace>_2_data_transfer</RootNamespace>
-    <ProjectName>2_data_transfer_and_GPU_programming</ProjectName>
+    <ProjectGuid>{44D94077-0ABA-4B87-A592-76F10E3CE0F8}</ProjectGuid>
+    <RootNamespace>_3_occupation_coding</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
