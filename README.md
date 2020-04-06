@@ -1,3 +1,3 @@
 # CUDA_Programming
 
-I will continue updating...
+Includes basic sample programs for gpu programming..
